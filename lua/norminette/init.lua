@@ -1,9 +1,7 @@
-local function norminette(file)
+local function send_current_file_to_qflist()
+  local file = vim.fn.expand('%')
   if file == '' then
-    file = vim.fn.expand('%')
-    if file == '' then
-      return
-    end
+    return
   end
 
   local output = vim.fn.systemlist('norminette ' .. file)
@@ -18,12 +16,10 @@ local function norminette(file)
   table.remove(output, 1)
   local items = {}
   for _, line in ipairs(output) do
-    local lnum = tonumber(line:match('line:%s*(%d+)'))
-    local col = tonumber(line:match('col:%s*(%d+)'))
     table.insert(items, {
       filename = file,
-      lnum = lnum,
-      col = col,
+      lnum = tonumber(line:match('line:%s*(%d+)')),
+      col = tonumber(line:match('col:%s*(%d+)')),
       text = line,
     });
   end
@@ -32,6 +28,35 @@ local function norminette(file)
   vim.cmd('copen')
 end
 
+local function send_to_qflist(args)
+  args = args or ''
+  local output = vim.fn.systemlist('norminette ' .. args)
+
+  local items = {}
+  local file
+  for _, line in ipairs(output) do
+    if line:find('Error') ~= nil then
+      if line:find('not valid C or C header file') ~= nil then
+      elseif line:find('Error!') ~= nil then
+        file = line:match('^(.*):')
+      else
+        table.insert(items, {
+          filename = file,
+          lnum = tonumber(line:match('line:%s*(%d+)')),
+          col = tonumber(line:match('col:%s*(%d+)')),
+          text = line,
+        });
+      end
+    end
+  end
+
+  if next(items) ~= nil then
+    vim.fn.setqflist(items, ' ')
+    vim.cmd('copen')
+  end
+end
+
 return {
-	norminette = norminette,
+	send_current_file_to_qflist = send_current_file_to_qflist,
+	send_to_qflist = send_to_qflist,
 }
