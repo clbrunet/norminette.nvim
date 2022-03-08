@@ -1,3 +1,13 @@
+local function get_qf_item(file, line)
+  return {
+    filename = file,
+    lnum = tonumber(line:match('line:%s*(%d+)')),
+    col = tonumber(line:match('col:%s*(%d+)')),
+    vcol = true,
+    text = line,
+  }
+end
+
 local function send_current_file_to_qflist()
   local file = vim.fn.expand('%')
   if file == '' then
@@ -12,16 +22,11 @@ local function send_current_file_to_qflist()
     print(output[1])
     return
   end
-
   table.remove(output, 1)
+
   local items = {}
   for _, line in ipairs(output) do
-    table.insert(items, {
-      filename = file,
-      lnum = tonumber(line:match('line:%s*(%d+)')),
-      col = tonumber(line:match('col:%s*(%d+)')),
-      text = line,
-    });
+    table.insert(items, get_qf_item(file, line));
   end
 
   vim.fn.setqflist(items, ' ')
@@ -40,12 +45,7 @@ local function send_to_qflist(args)
       elseif line:find('Error!') ~= nil then
         file = line:match('^(.*):')
       else
-        table.insert(items, {
-          filename = file,
-          lnum = tonumber(line:match('line:%s*(%d+)')),
-          col = tonumber(line:match('col:%s*(%d+)')),
-          text = line,
-        });
+        table.insert(items, get_qf_item(file, line));
       end
     end
   end
