@@ -1,0 +1,22 @@
+*norminette.txt*                          42 norminette errors navigation plugin
+
+================================================================================
+CONTENTS                                                   *norminette-contents*
+
+  Usage ····················································· |norminette-usage|
+    Commands ············································· |norminette-commands|
+
+================================================================================
+USAGE                                                         *norminette-usage*
+
+                                                           *norminette-commands*
+Commands~
+
+`:NorminetteCurrentFile`                                *:NorminetteCurrentFile*
+  Send current file errors to quickfix list.
+
+`:Norminette [arguments]`                                          *:Norminette*
+  Send all errors raised by norminette to quickfix list.
+
+================================================================================
+ vim:tw=78:ts=8:ft=help:norl:
